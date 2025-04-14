@@ -1,25 +1,25 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 import os
-import requests
-from flask import Flask, request, jsonify
 
-app = Flask(__name__)
+app = FastAPI()
 
-# ✅ Le credenziali vengono ora prese dalle variabili ambiente di Render
-CLIENT_ID = os.environ.get('CLIENT_ID')
-TENANT_ID = os.environ.get('TENANT_ID')
-CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+# Modello per richiesta API
+class RequestData(BaseModel):
+    folder: str
 
-# Funzione per ottenere il token di accesso
-def get_access_token():
-    url = f'https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token'
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-    data = {
-        'grant_type': 'client_credentials',
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'scope': 'https://graph.microsoft.com/.default'
-    }
+@app.get("/")
+def read_root():
+    return {"message": "GPT OneDrive API is running ✅"}
 
-    response = requests
+@app.post("/files")
+def read_files(data: RequestData):
+    folder_path = data.folder
+    # Simulazione: restituisce il percorso ricevuto (sostituisci con la tua logica)
+    return {"received_folder": folder_path}
+
+if __name__ == "__main__":
+    # Porta dinamica per Render
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
